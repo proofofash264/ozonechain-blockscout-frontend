@@ -1,64 +1,64 @@
 // SPDX-License-Identifier: LicenseRef-Blockscout
 
-import { Grid } from '@chakra-ui/react';
-import BigNumber from 'bignumber.js';
-import React from 'react';
+import { Grid } from "@chakra-ui/react";
+import BigNumber from "bignumber.js";
+import React from "react";
 
-import useApiQuery from 'src/api/hooks/useApiQuery';
+import useApiQuery from "src/api/hooks/useApiQuery";
 
-import useStatsQuery from 'src/slices/chain/stats/useStatsQuery';
-import GasInfoTooltip from 'src/slices/gas/components/GasInfoTooltip';
-import GasPrice from 'src/slices/gas/components/GasPrice';
-import discriminateDetailedPrices from 'src/slices/gas/utils/price';
-import { useHomeDataContext } from 'src/slices/home/contexts/home-data-context';
-import useOzoneBalancesTotalsQuery from 'src/slices/home/hooks/useOzoneBalancesTotalsQuery';
-import useOzonePriceQuery from 'src/slices/home/hooks/useOzonePriceQuery';
-import type { HomeStatsItem } from 'src/slices/home/utils/stats';
+import useStatsQuery from "src/slices/chain/stats/useStatsQuery";
+import GasInfoTooltip from "src/slices/gas/components/GasInfoTooltip";
+import GasPrice from "src/slices/gas/components/GasPrice";
+import discriminateDetailedPrices from "src/slices/gas/utils/price";
+import { useHomeDataContext } from "src/slices/home/contexts/home-data-context";
+import useOzoneBalancesTotalsQuery from "src/slices/home/hooks/useOzoneBalancesTotalsQuery";
+import useOzonePriceQuery from "src/slices/home/hooks/useOzonePriceQuery";
+import type { HomeStatsItem } from "src/slices/home/utils/stats";
 import {
   homeStatsWidgetCommonStyles,
   isHomeStatsItemEnabled,
   sortHomeStatsItems,
-} from 'src/slices/home/utils/stats';
+} from "src/slices/home/utils/stats";
 
-import { HOMEPAGE_STATS_MICROSERVICE } from 'src/features/chain-stats/stubs/home';
-import { layerLabels } from 'src/features/rollup/common/utils/layer';
+import { HOMEPAGE_STATS_MICROSERVICE } from "src/features/chain-stats/stubs/home";
+import { layerLabels } from "src/features/rollup/common/utils/layer";
 
-import config from 'src/config';
-import StatsWidget from 'src/shared/stats/StatsWidget';
-import { WEI } from 'src/shared/values/entity/utils';
-import SpriteIcon from 'src/sprite/SpriteIcon';
+import config from "src/config";
+import StatsWidget from "src/shared/stats/StatsWidget";
+import { WEI } from "src/shared/values/entity/utils";
+import SpriteIcon from "src/sprite/SpriteIcon";
 
-import LatestBatchStatsWidget from './LatestBatchStatsWidget';
-import LatestBlockStatsWidget from './LatestBlockStatsWidget';
-import StatsDegraded from './StatsDegraded';
+import LatestBatchStatsWidget from "./LatestBatchStatsWidget";
+import LatestBlockStatsWidget from "./LatestBlockStatsWidget";
+import StatsDegraded from "./StatsDegraded";
 
 const rollupFeature = config.features.rollup;
 const isOptimisticRollup =
-  rollupFeature.isEnabled && rollupFeature.type === 'optimistic';
+  rollupFeature.isEnabled && rollupFeature.type === "optimistic";
 const isArbitrumRollup =
-  rollupFeature.isEnabled && rollupFeature.type === 'arbitrum';
+  rollupFeature.isEnabled && rollupFeature.type === "arbitrum";
 const isStatsFeatureEnabled = config.features.stats.isEnabled;
 
 const Stats = () => {
-  const [ hasGasTracker, setHasGasTracker ] = React.useState(
+  const [hasGasTracker, setHasGasTracker] = React.useState(
     config.features.gasTracker.isEnabled,
   );
   const { blocksQuery, latestBatchQuery } = useHomeDataContext();
 
   // data from stats microservice is prioritized over data from stats api
-  const statsQuery = useApiQuery('stats:pages_main', {
+  const statsQuery = useApiQuery("stats:pages_main", {
     queryOptions: {
       refetchOnMount: false,
-      placeholderData: isStatsFeatureEnabled ?
-        HOMEPAGE_STATS_MICROSERVICE :
-        undefined,
+      placeholderData: isStatsFeatureEnabled
+        ? HOMEPAGE_STATS_MICROSERVICE
+        : undefined,
       enabled: isStatsFeatureEnabled,
       refetchInterval: (query) => {
-        if (query.state.status === 'error') {
+        if (query.state.status === "error") {
           return false;
         }
 
-        return config.apis.stats?.refetchInterval?.['stats:pages_main'];
+        return config.apis.stats?.refetchInterval?.["stats:pages_main"];
       },
     },
   });
@@ -78,7 +78,7 @@ const Stats = () => {
     }
     // should run only after initial fetch
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ isPlaceholderData ]);
+  }, [isPlaceholderData]);
 
   const hasStatsError =
     apiQuery.isError ||
@@ -87,7 +87,7 @@ const Stats = () => {
     latestBatchQuery?.isError;
 
   if (hasStatsError) {
-    return <StatsDegraded/>;
+    return <StatsDegraded />;
   }
 
   const isLoading = isPlaceholderData || latestBatchQuery?.isPlaceholderData;
@@ -109,114 +109,119 @@ const Stats = () => {
         return null;
       }
 
-      return `${ Math.round(amount).toLocaleString() } ${ currencySymbol }`;
+      return `${Math.round(amount).toLocaleString()} ${currencySymbol}`;
     };
 
-    const tvlValue = ozoneBalancesQuery.data?.success ?
-      formatFullBalance(ozoneBalancesQuery.data.data.contractsTotalBalance) :
-      null;
-    const circulatingSupplyValue = ozoneBalancesQuery.data?.success ?
-      formatFullBalance(ozoneBalancesQuery.data.data.eoasTotalBalance) :
-      null;
+    const balancesData = ozoneBalancesQuery.data?.success
+      ? ozoneBalancesQuery.data.data
+      : undefined;
+    const totalSupplyValue = formatFullBalance(balancesData?.totalSupply);
+    const circulatingSupplyValue = formatFullBalance(
+      balancesData?.circulatingSupply,
+    );
+    const platformTvlValue = formatFullBalance(
+      balancesData?.platformTvlBalance,
+    );
+    const userTvlValue = formatFullBalance(balancesData?.userTvlBalance);
 
     const gasInfoTooltip =
       hasGasTracker && apiData?.gas_prices && apiData.gas_prices.average ? (
-        <GasInfoTooltip data={ apiData } dataUpdatedAt={ apiQuery.dataUpdatedAt }>
+        <GasInfoTooltip data={apiData} dataUpdatedAt={apiQuery.dataUpdatedAt}>
           <SpriteIcon
-            isLoading={ isLoading }
+            isLoading={isLoading}
             name="info"
-            boxSize={ 5 }
-            flexShrink={ 0 }
+            boxSize={5}
+            flexShrink={0}
             cursor="pointer"
             color="icon.secondary"
-            _hover={{ color: 'hover' }}
+            _hover={{ color: "hover" }}
           />
         </GasInfoTooltip>
       ) : null;
 
     return [
       latestBatchQuery?.data !== undefined && {
-        id: 'latest_batch' as const,
+        id: "latest_batch" as const,
         component: (
           <LatestBatchStatsWidget
-            isLoading={ Boolean(isLoading) }
-            { ...homeStatsWidgetCommonStyles }
+            isLoading={Boolean(isLoading)}
+            {...homeStatsWidgetCommonStyles}
           />
         ),
       },
       (blocksQuery?.data?.[0]?.height ??
         statsData?.total_blocks?.value ??
         apiData?.total_blocks) && {
-        id: 'total_blocks' as const,
+        id: "total_blocks" as const,
         component: (
           <LatestBlockStatsWidget
-            isLoading={ Boolean(isLoading) }
+            isLoading={Boolean(isLoading)}
             fallbackValue={
               statsData?.total_blocks?.value ?? apiData?.total_blocks
             }
-            { ...homeStatsWidgetCommonStyles }
+            {...homeStatsWidgetCommonStyles}
           />
         ),
       },
       (statsData?.average_block_time?.value || apiData?.average_block_time) && {
-        id: 'average_block_time' as const,
-        icon: 'clock-light' as const,
-        label: statsData?.average_block_time?.title || 'Average block time',
+        id: "average_block_time" as const,
+        icon: "clock-light" as const,
+        label: statsData?.average_block_time?.title || "Average block time",
         value: `${
-          statsData?.average_block_time?.value ?
-            Number(statsData.average_block_time.value).toFixed(1) :
-            (apiData!.average_block_time / 1000).toFixed(1)
+          statsData?.average_block_time?.value
+            ? Number(statsData.average_block_time.value).toFixed(1)
+            : (apiData!.average_block_time / 1000).toFixed(1)
         }s`,
         isLoading,
       },
       (statsData?.total_transactions?.value || apiData?.total_transactions) && {
-        id: 'total_txs' as const,
-        icon: 'transactions' as const,
-        label: statsData?.total_transactions?.title || 'Total transactions',
+        id: "total_txs" as const,
+        icon: "transactions" as const,
+        label: statsData?.total_transactions?.title || "Total transactions",
         value: Number(
           statsData?.total_transactions?.value || apiData?.total_transactions,
         ).toLocaleString(),
-        href: { pathname: '/txs' as const },
+        href: { pathname: "/txs" as const },
         isLoading,
       },
       isArbitrumRollup &&
         statsData?.total_operational_transactions?.value && {
-        id: 'total_operational_txs' as const,
-        icon: 'transactions' as const,
-        label:
+          id: "total_operational_txs" as const,
+          icon: "transactions" as const,
+          label:
             statsData?.total_operational_transactions?.title ||
-            'Total operational transactions',
-        value: Number(
-          statsData?.total_operational_transactions?.value,
-        ).toLocaleString(),
-        href: { pathname: '/txs' as const },
-        isLoading,
-      },
+            "Total operational transactions",
+          value: Number(
+            statsData?.total_operational_transactions?.value,
+          ).toLocaleString(),
+          href: { pathname: "/txs" as const },
+          isLoading,
+        },
       isOptimisticRollup &&
         statsData?.op_stack_total_operational_transactions?.value && {
-        id: 'total_operational_txs' as const,
-        icon: 'transactions' as const,
-        label:
+          id: "total_operational_txs" as const,
+          icon: "transactions" as const,
+          label:
             statsData?.op_stack_total_operational_transactions?.title ||
-            'Total operational transactions',
-        value: Number(
-          statsData?.op_stack_total_operational_transactions?.value,
-        ).toLocaleString(),
-        href: { pathname: '/txs' as const },
-        isLoading,
-      },
+            "Total operational transactions",
+          value: Number(
+            statsData?.op_stack_total_operational_transactions?.value,
+          ).toLocaleString(),
+          href: { pathname: "/txs" as const },
+          isLoading,
+        },
       apiData?.last_output_root_size && {
-        id: 'latest_l1_state_batch' as const,
-        icon: 'txn_batches' as const,
-        label: `Latest ${ layerLabels.parent } state batch`,
+        id: "latest_l1_state_batch" as const,
+        icon: "txn_batches" as const,
+        label: `Latest ${layerLabels.parent} state batch`,
         value: apiData?.last_output_root_size,
-        href: { pathname: '/batches' as const },
+        href: { pathname: "/batches" as const },
         isLoading,
       },
       (statsData?.total_addresses?.value || apiData?.total_addresses) && {
-        id: 'wallet_addresses' as const,
-        icon: 'wallet' as const,
-        label: statsData?.total_addresses?.title || 'Wallet addresses',
+        id: "wallet_addresses" as const,
+        icon: "wallet" as const,
+        label: statsData?.total_addresses?.title || "Wallet addresses",
         value: Number(
           statsData?.total_addresses?.value || apiData?.total_addresses,
         ).toLocaleString(),
@@ -224,54 +229,70 @@ const Stats = () => {
       },
       hasGasTracker &&
         gasPrices && {
-        id: 'gas_tracker' as const,
-        icon: 'gas' as const,
-        label: 'Gas tracker',
-        value: gasPrices?.average ? (
-          <GasPrice data={ gasPrices.average }/>
-        ) : (
-          'N/A'
-        ),
-        hint: gasInfoTooltip,
-        isLoading,
-      },
+          id: "gas_tracker" as const,
+          icon: "gas" as const,
+          label: "Gas tracker",
+          value: gasPrices?.average ? (
+            <GasPrice data={gasPrices.average} />
+          ) : (
+            "N/A"
+          ),
+          hint: gasInfoTooltip,
+          isLoading,
+        },
       ozonePriceQuery.data?.success && {
-        id: 'coin_price' as const,
-        icon: 'payment_link' as const,
-        label: 'Price',
-        value: `$ ${ ozonePriceQuery.data.data.toLocaleString() }`,
+        id: "coin_price" as const,
+        icon: "payment_link" as const,
+        label: "Price",
+        value: `$ ${ozonePriceQuery.data.data.toLocaleString()}`,
         isLoading: ozonePriceQuery.isPlaceholderData,
       },
-      tvlValue && {
-        id: 'tvl' as const,
-        icon: 'lock' as const,
-        label: 'TVL',
-        value: tvlValue,
-        hint: `Total ${ currencySymbol } held in smart contracts`,
+      totalSupplyValue && {
+        id: "total_supply" as const,
+        icon: "tokens" as const,
+        label: "Total supply",
+        value: totalSupplyValue,
+        hint: `Total ${currencySymbol} supply`,
         isLoading: ozoneBalancesQuery.isPlaceholderData,
       },
       circulatingSupplyValue && {
-        id: 'circulating_supply' as const,
-        icon: 'wallet' as const,
-        label: 'Circulating supply',
+        id: "circulating_supply" as const,
+        icon: "wallet" as const,
+        label: "Circulating supply",
         value: circulatingSupplyValue,
-        hint: `Total ${ currencySymbol } held in externally owned accounts (EOAs)`,
+        hint: `Circulating ${currencySymbol} supply`,
+        isLoading: ozoneBalancesQuery.isPlaceholderData,
+      },
+      platformTvlValue && {
+        id: "platform_tvl" as const,
+        icon: "lock" as const,
+        label: "Platform TVL",
+        value: platformTvlValue,
+        hint: `Total ${currencySymbol} locked in the platform`,
+        isLoading: ozoneBalancesQuery.isPlaceholderData,
+      },
+      userTvlValue && {
+        id: "user_tvl" as const,
+        icon: "lock" as const,
+        label: "User TVL",
+        value: userTvlValue,
+        hint: `Total ${currencySymbol} locked by users`,
         isLoading: ozoneBalancesQuery.isPlaceholderData,
       },
       apiData?.rootstock_locked_btc && {
-        id: 'btc_locked' as const,
-        icon: 'coins/bitcoin' as const,
-        label: 'BTC Locked in 2WP',
-        value: `${ BigNumber(apiData.rootstock_locked_btc).div(WEI).dp(0).toFormat() } RBTC`,
+        id: "btc_locked" as const,
+        icon: "coins/bitcoin" as const,
+        label: "BTC Locked in 2WP",
+        value: `${BigNumber(apiData.rootstock_locked_btc).div(WEI).dp(0).toFormat()} RBTC`,
         isLoading,
       },
       apiData?.celo && {
-        id: 'current_epoch' as const,
-        icon: 'hourglass' as const,
-        label: 'Current epoch',
-        value: `#${ apiData.celo.epoch_number }`,
+        id: "current_epoch" as const,
+        icon: "hourglass" as const,
+        label: "Current epoch",
+        value: `#${apiData.celo.epoch_number}`,
         href: {
-          pathname: '/epochs/[number]' as const,
+          pathname: "/epochs/[number]" as const,
           query: { number: String(apiData.celo.epoch_number) },
         },
         isLoading,
@@ -291,24 +312,24 @@ const Stats = () => {
       gridTemplateColumns="1fr 1fr"
       gridGap={{ base: 1, lg: 2 }}
       flexBasis="50%"
-      flexGrow={ 1 }
+      flexGrow={1}
     >
-      { items.map((item) => {
-        if ('component' in item) {
+      {items.map((item) => {
+        if ("component" in item) {
           return (
-            <React.Fragment key={ item.id }>{ item.component }</React.Fragment>
+            <React.Fragment key={item.id}>{item.component}</React.Fragment>
           );
         }
 
         return (
           <StatsWidget
-            key={ item.id }
-            { ...item }
-            { ...homeStatsWidgetCommonStyles }
-            isLoading={ isLoading }
+            key={item.id}
+            {...item}
+            {...homeStatsWidgetCommonStyles}
+            isLoading={isLoading}
           />
         );
-      }) }
+      })}
     </Grid>
   );
 };
