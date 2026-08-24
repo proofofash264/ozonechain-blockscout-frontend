@@ -119,8 +119,11 @@ const Stats = () => {
     const circulatingSupplyValue = formatFullBalance(
       balancesData?.circulatingSupply,
     );
-    const platformTvlValue = formatFullBalance(
-      balancesData?.platformTvlBalance,
+    const protocolTvlValue = formatFullBalance(
+      balancesData?.protocolTvlBalance,
+    );
+    const managementTvlValue = formatFullBalance(
+      balancesData?.managementTvlBalance,
     );
     const userTvlValue = formatFullBalance(balancesData?.userTvlBalance);
 
@@ -263,12 +266,20 @@ const Stats = () => {
         hint: `Circulating ${currencySymbol} supply`,
         isLoading: ozoneBalancesQuery.isPlaceholderData,
       },
-      platformTvlValue && {
-        id: "platform_tvl" as const,
+      protocolTvlValue && {
+        id: "protocol_tvl" as const,
         icon: "lock" as const,
-        label: "Platform TVL",
-        value: platformTvlValue,
-        hint: `Total ${currencySymbol} locked in the platform`,
+        label: "Protocol TVL",
+        value: protocolTvlValue,
+        hint: `Total ${currencySymbol} locked in the protocol`,
+        isLoading: ozoneBalancesQuery.isPlaceholderData,
+      },
+      managementTvlValue && {
+        id: "management_tvl" as const,
+        icon: "lock" as const,
+        label: "Management TVL",
+        value: managementTvlValue,
+        hint: `Total ${currencySymbol} locked in management`,
         isLoading: ozoneBalancesQuery.isPlaceholderData,
       },
       userTvlValue && {

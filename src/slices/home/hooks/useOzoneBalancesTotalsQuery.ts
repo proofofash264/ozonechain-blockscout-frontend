@@ -6,7 +6,8 @@ import useFetch from "src/api/hooks/useFetch";
 
 export type OzoneBalancesTotalsData = {
   circulatingSupply: string;
-  platformTvlBalance: string;
+  protocolTvlBalance: string;
+  managementTvlBalance: string;
   userTvlBalance: string;
   totalSupply: string;
   lastSynced: string;
@@ -34,7 +35,8 @@ export default function useOzoneBalancesTotalsQuery() {
       message: "Total balances retrieved successfully",
       data: {
         circulatingSupply: "-",
-        platformTvlBalance: "-",
+        protocolTvlBalance: "-",
+        managementTvlBalance: "-",
         userTvlBalance: "-",
         totalSupply: "-",
         lastSynced: "",
