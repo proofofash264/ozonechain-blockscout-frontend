@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm run build && pnpm run generate:dev",
-    "build": "vite build --logLevel error",
+    "dev": "node api.js && pnpm run build && pnpm run generate:dev",
+    "build": "node api.js && vite build --logLevel error",
     "generate": "node dist/index.js",
     "generate:dev": "../../../tools/dev-server/fetch.sh eth && dotenv -e ./.env.tmp -- node dist/index.js"
   },
