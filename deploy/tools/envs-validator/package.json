@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "vite build --logLevel error",
+    "build": "node init && vite build --logLevel error",
     "validate": "node ./dist/index.js",
     "test": "./test.sh"
   },
