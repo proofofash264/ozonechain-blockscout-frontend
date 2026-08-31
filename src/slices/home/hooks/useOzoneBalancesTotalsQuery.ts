@@ -8,6 +8,7 @@ export type OzoneBalancesTotalsData = {
   circulatingSupply: string;
   protocolTvlBalance: string;
   managementTvlBalance: string;
+  promotionAndOffersTvlBalance: string;
   userTvlBalance: string;
   totalSupply: string;
   lastSynced: string;
@@ -37,6 +38,7 @@ export default function useOzoneBalancesTotalsQuery() {
         circulatingSupply: "-",
         protocolTvlBalance: "-",
         managementTvlBalance: "-",
+        promotionAndOffersTvlBalance: "-",
         userTvlBalance: "-",
         totalSupply: "-",
         lastSynced: "",

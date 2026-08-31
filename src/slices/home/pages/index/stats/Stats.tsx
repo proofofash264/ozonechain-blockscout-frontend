@@ -125,6 +125,9 @@ const Stats = () => {
     const managementTvlValue = formatFullBalance(
       balancesData?.managementTvlBalance,
     );
+    const promotionsAndOffersTvlValue = formatFullBalance(
+      balancesData?.promotionAndOffersTvlBalance,
+    );
     const userTvlValue = formatFullBalance(balancesData?.userTvlBalance);
 
     const gasInfoTooltip =
@@ -280,6 +283,14 @@ const Stats = () => {
         label: "Management TVL",
         value: managementTvlValue,
         hint: `Total ${currencySymbol} locked in management`,
+        isLoading: ozoneBalancesQuery.isPlaceholderData,
+      },
+      promotionsAndOffersTvlValue && {
+        id: "promotions_and_offers_tvl" as const,
+        icon: "lock" as const,
+        label: "Promotions and Offers TVL",
+        value: promotionsAndOffersTvlValue,
+        hint: `Total ${currencySymbol} locked in promotions and offers`,
         isLoading: ozoneBalancesQuery.isPlaceholderData,
       },
       userTvlValue && {

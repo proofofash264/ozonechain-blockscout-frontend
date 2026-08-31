@@ -24,6 +24,7 @@ export const HOME_STATS_WIDGET_IDS = [
   "circulating_supply",
   "protocol_tvl",
   "management_tvl",
+  "promotions_and_offers_tvl",
   "user_tvl",
   "btc_locked",
   "current_epoch",
