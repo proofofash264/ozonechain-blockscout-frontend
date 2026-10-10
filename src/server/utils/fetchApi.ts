@@ -6,6 +6,8 @@ import buildUrl from 'src/server/utils/buildUrl';
 import { httpLogger } from 'src/server/utils/logger';
 
 import type { ResourceName, ResourcePathParams, ResourcePayload } from 'src/api/resources';
+import getNoRateLimitHeaders from 'src/api/utils/get-no-rate-limit-headers';
+import getResourceParams from 'src/api/utils/get-resource-params';
 
 import { SECOND } from 'src/toolkit/utils/consts';
 
@@ -25,11 +27,15 @@ export default async function fetchApi<R extends ResourceName = never, S = Resou
   }, params.timeout || SECOND);
 
   const url = buildUrl(params.resource, params.pathParams, params.queryParams);
+  const { apiName } = getResourceParams(params.resource);
 
   const end = metrics?.apiRequestDuration.startTimer();
 
   try {
-    const response = await fetch(url, { signal: controller.signal });
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: getNoRateLimitHeaders(apiName),
+    });
 
     const duration = end?.({ route: params.resource, code: response.status });
     if (response.status === 200) {
