@@ -25,6 +25,7 @@ export interface ApiPropsFull extends ApiPropsBase {
   protocol: string;
   port?: string;
   socketEndpoint: string;
+  noRateLimitApiKey?: string;
 }
 
 const coreApi = (() => {
@@ -57,6 +58,7 @@ const coreApi = (() => {
     host: apiHost ?? '',
     protocol: apiSchema ?? 'https',
     port: apiPort,
+    noRateLimitApiKey: getEnvValue('NEXT_PUBLIC_API_NO_RATE_LIMIT_API_KEY'),
   });
 })();
 

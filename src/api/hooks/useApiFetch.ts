@@ -11,6 +11,7 @@ import * as cookies from 'src/shared/storage/cookies';
 
 import type { ResourceName, ResourcePathParams } from '../resources';
 import buildUrl from '../utils/build-url';
+import getNoRateLimitHeaders from '../utils/get-no-rate-limit-headers';
 import getResourceParams from '../utils/get-resource-params';
 import isBodyAllowed from '../utils/is-body-allowed';
 import isNeedProxy from '../utils/is-need-proxy';
@@ -48,6 +49,7 @@ export default function useApiFetch() {
       'x-endpoint': isNeedProxy() ? api.endpoint : undefined,
       Authorization: [ 'admin', 'contractInfo' ].includes(apiName) ? apiToken : undefined,
       'x-csrf-token': [ 'core', 'admin', 'contractInfo' ].includes(apiName) && withBody && csrfToken ? csrfToken : undefined,
+      ...getNoRateLimitHeaders(apiName),
       ...(apiName === 'core' ? {
         'api-v2-temp-token': apiTempToken,
         'show-scam-tokens': showScamTokens ? 'true' : undefined,

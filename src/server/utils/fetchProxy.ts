@@ -7,6 +7,7 @@ import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
 import type { RequestInit, Response } from 'node-fetch';
 import nodeFetch from 'node-fetch';
 
+import appConfig from 'src/config';
 import { httpLogger } from 'src/server/utils/logger';
 
 export default function fetchFactory(
@@ -18,6 +19,12 @@ export default function fetchFactory(
     const cookie = Object.entries(_req.cookies)
       .map(([ key, value ]) => `${ key }=${ value }`)
       .join('; ');
+
+    const coreEndpoint = appConfig.apis.core?.endpoint;
+    const noRateLimitApiKey = appConfig.apis.core?.noRateLimitApiKey;
+    const coreNoRateLimitHeaders = noRateLimitApiKey && coreEndpoint && url.startsWith(coreEndpoint) ?
+      { 'x-api-key': noRateLimitApiKey } :
+      undefined;
 
     const headers = {
       accept: _req.headers['accept'] || 'application/json',
@@ -34,6 +41,7 @@ export default function fetchFactory(
         // feature flags
         'updated-gas-oracle',
       ]) as Record<string, string | undefined>,
+      ...coreNoRateLimitHeaders,
     };
 
     httpLogger.logger.info({
