@@ -143,6 +143,7 @@ Primary Blockscout backend that serves the main explorer data (blocks, transacti
 | NEXT_PUBLIC_API_PORT               | `number`        | Port where API is running on the host | -                                | -             | `3001`           | v1.0.x+ |
 | NEXT_PUBLIC_API_BASE_PATH          | `string`        | Base path for Core API endpoint url   | -                                | -             | `/poa/core`      | v1.0.x+ |
 | NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL | `ws \| wss`     | Core API websocket protocol           | -                                | `wss`         | `ws`             | v1.0.x+ |
+| NEXT_PUBLIC_API_NO_RATE_LIMIT_API_KEY | `string`     | API key sent as `x-api-key` on the explorer's own Core API requests so page rendering is not rate limited. Swagger "Try it out" and third-party integrations do not receive this key. Must match backend `API_NO_RATE_LIMIT_API_KEY`. | - | - | `unlimited_request` | |
 
 &nbsp;
 
