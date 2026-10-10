@@ -18,6 +18,7 @@ export default yup.object({
     NEXT_PUBLIC_API_PORT: yup.number().integer().positive(),
     NEXT_PUBLIC_API_BASE_PATH: yup.string(),
     NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL: yup.string().oneOf([ 'ws', 'wss' ]),
+    NEXT_PUBLIC_API_NO_RATE_LIMIT_API_KEY: yup.string(),
 
     NEXT_PUBLIC_STATS_API_HOST: yup.string().test(urlTest),
     NEXT_PUBLIC_STATS_API_BASE_PATH: yup.string(),
