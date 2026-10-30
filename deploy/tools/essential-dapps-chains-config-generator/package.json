@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node init && vite build --logLevel error",
+    "build": "vite build --logLevel error",
     "generate": "node dist/index.js",
-    "dev": "node init && ./dev.sh"
+    "dev": "./dev.sh"
   },
   "dependencies": {
     "es-toolkit": "1.39.10",

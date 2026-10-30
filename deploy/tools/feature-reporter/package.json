@@ -5,9 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "node init && vite build --logLevel error",
+    "build": "vite build --logLevel error",
     "print_report": "node ./dist/index.js",
-    "dev": "node init && ./dev.sh"
+    "dev": "./dev.sh"
   },
   "devDependencies": {
     "@types/node": "22.12.0",
