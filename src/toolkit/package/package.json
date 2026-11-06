@@ -36,8 +36,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "node init && vite build",
-    "dev": "node init && vite",
+    "build": "vite build",
+    "dev": "vite",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
