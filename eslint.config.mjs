@@ -18,13 +18,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import tseslint from 'typescript-eslint';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
-var require = createRequire(import.meta.url);
-var module = { exports: {} };
-
 
 const SPDX_HEADER = '// SPDX-License-Identifier: LicenseRef-Blockscout';
 
