@@ -105,12 +105,9 @@ const Stats = () => {
     const gasPrices = discriminateDetailedPrices(apiData?.gas_prices);
     const currencySymbol = config.chain.currency.symbol;
 
-    const formatFullBalance = (
-      raw: string | undefined,
-      { allowZero = false }: { allowZero?: boolean } = {},
-    ) => {
+    const formatFullBalance = (raw: string | undefined) => {
       const amount = Number(raw);
-      if (!Number.isFinite(amount) || amount < 0 || (!allowZero && amount === 0)) {
+      if (!Number.isFinite(amount) || amount <= 0) {
         return null;
       }
 
@@ -136,7 +133,6 @@ const Stats = () => {
     const userTvlValue = formatFullBalance(balancesData?.userTvlBalance);
     const validatorBondedTokensValue = formatFullBalance(
       balancesData?.validatorBondedTokens,
-      { allowZero: true },
     );
 
     const gasInfoTooltip =
